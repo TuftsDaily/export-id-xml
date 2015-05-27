@@ -1,0 +1,13 @@
+<article name="{{ headline }}">
+	<headline>{{ headline }}</headline>
+	<author><byline>by {{ author }}</byline>
+<rank>{{ rank }}</rank></author>
+	<jump>see {{ jumpword }}, page xx</jump>
+	<conthead>{{ conthead }}</conthead>
+	<continuation><contjump>{{ jumpword }}</contjump>
+<contpage>continued from page xx</contpage></continuation>
+	<photo><photocredit>{{ photocredit }}</photocredit>
+<photocaption>{{ photocaption }}</photocaption></photo>
+	<thumbnail>{{ thumbnail }}</thumbnail>
+	<body>{{ body }}</body>
+</article>
