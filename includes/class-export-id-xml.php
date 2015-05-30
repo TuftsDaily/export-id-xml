@@ -4,9 +4,9 @@ class Export_ID_XML {
 
 	public function __construct() {
 
-		// Load Mustache Template Engine
-		require_once('Mustache/Autoloader.php');
-		Mustache_Autoloader::register();
+		// Load Handlebars Template Engine
+		require_once('Handlebars/Autoloader.php');
+		Handlebars\Autoloader::register();
 
 		// Load Plugin Modules
 		require_once('class-export-id-xml-admin.php');
