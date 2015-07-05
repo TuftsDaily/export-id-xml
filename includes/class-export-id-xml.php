@@ -23,6 +23,9 @@ class Export_ID_XML {
 
 	private function setup_admin_hooks() {
 
+		$admin = new Export_ID_XML_Admin();
+		$admin->run();
+
 	}
 
 	private function setup_public_hooks() {
@@ -53,8 +56,8 @@ class Export_ID_XML {
 		//add_rewrite_rule('^xml/article/([0-9]+)/?','index.php?__xml=1&xml_article=$matches[1]','top');
 
 		// Matches Date and Category
-		//add_rewrite_rule('^xml/category/([A-Za-z]+)/date/([0-9-]+)/?','index.php?__xml=1&xml_category=$matches[1]&xml_date=$matches[2]','top');
-		add_rewrite_rule('^xml/?','index.php?__xml=1','top');
+		add_rewrite_rule('^xml/category/([A-Za-z]+)/date/([0-9-]+)/?','index.php?__xml=1&xml_category=$matches[1]&xml_date=$matches[2]','top');
+		//add_rewrite_rule('^xml/?','index.php?__xml=1','top');
 
 		// Matches Date Queries Only
 		//add_rewrite_rule('^xml/date/([0-9-]+)/?','index.php?__xml=1&xml_date=$matches[1]','top');
@@ -73,8 +76,8 @@ class Export_ID_XML {
 	private function handle_request() {
 
 		global $wp;
-		/*$category = $wp->query_vars['xml_category'];
-		$date = $wp->query_vars['xml_date'];
+		$xml_category = $wp->query_vars['xml_category'];
+		$xml_date = $wp->query_vars['xml_date'];
 		
 		// Make Sure Required Params Were Given
 		if(!$xml_category)
@@ -83,17 +86,18 @@ class Export_ID_XML {
 			$this->send_error("Date for articles not provided."); 
 		
 		// Make Sure Params are Valid
-		$catID = get_category_by_slug($xml_category);
-		if (!$catID)
+		$cat = get_category_by_slug($xml_category);
+		if (!$cat)
 			$this->send_error("Category not found.");
+		$catID = $cat->cat_ID;
 
 		// Check for Proper Date Format: YYYY-MM-DD
-		if (!preg_match("/[0-9]{4}-[0-9]{2}-[0-9]{2}/", $date))
-			$this->send_error("Invalid date format.");*/
+		if (!preg_match("/[0-9]{4}-[0-9]{2}-[0-9]{2}/", $xml_date))
+			$this->send_error("Invalid date format.");
 
 		// Generate and Output the XML
-		//$xml = Export_ID_XML_Generator::generate_category($catID, $date);
-		$xml = Export_ID_XML_Generator::generate_article(18);
+		$xml = Export_ID_XML_Generator::generate_category($catID, $xml_date);
+		//$xml = Export_ID_XML_Generator::generate_article(18);
 
 		ob_end_clean();
 

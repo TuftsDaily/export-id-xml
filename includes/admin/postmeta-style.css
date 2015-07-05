@@ -1,0 +1,12 @@
+#export_id_xml_options input {
+	display: block;
+	margin-bottom: 15px;
+}
+
+#export_id_xml_options label {
+	display: block;
+}
+
+#export_id_xml_options input.showfor {
+	display: none;
+}

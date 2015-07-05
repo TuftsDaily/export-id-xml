@@ -21,9 +21,27 @@ class Export_ID_XML_Generator {
 
 	public static function generate_category($catID, $date) {
 
+		var_dump($catID);
+		var_dump($date);
+
 		// Query All Posts by Print Date
+		$args = array(
+			'meta_key' => 'export_id_xml_print_date',
+			'meta_value' => $date,
+			'category' => $catID
+		);
+		$posts = get_posts($args);
+
+		if (sizeof($posts) == 0) {
+			return "<error>No posts found for this category and date.</error>";
+		}
 		
 		// Generate XML For Each Article
+		$aggregateXML = "";
+		foreach ($posts as $post) {
+			$aggregateXML .= self::generate_article($post->ID);
+		}
+		return $aggregateXML;
 
 	}
 
@@ -33,6 +51,8 @@ class Export_ID_XML_Generator {
 	private $context;
 	// XML Template to Use for Rendering
 	private $template;
+	// Data Attached to Post by Print Options Box
+	private $meta;
 
 	// Constructor for Object-Based Version of Class
 	public function __construct($post) {
@@ -41,10 +61,15 @@ class Export_ID_XML_Generator {
 		$this->context = array();
 		$this->template = 'standard';
 
+		$this->meta = get_post_meta( $post->ID, Export_ID_XML_Admin_PostMeta::$META_KEY_NAME, true );
+
 		$this->context['headline'] = $this->get_title();
 		$this->context['author'] = $this->get_author();
 		$this->context['rank'] = $this->get_rank();
 		$this->context['body'] = $this->get_body();
+		$this->context['jumpword'] = $this->get_jumpword();
+		$this->context['conthead'] = $this->get_conthead();
+		$this->context['hammer'] = $this->get_hammer();
 
 	}
 
@@ -180,6 +205,18 @@ class Export_ID_XML_Generator {
 		return $body;
 
 	}
+
+	private function get_jumpword() {
+		return ( isSet( $this->meta['jumpword'] ) ) ? $this->meta['jumpword'] : false;
+	}
+
+	private function get_conthead() {
+		return ( isSet( $this->meta['conthead'] ) ) ? $this->meta['conthead'] : false;
+	}
+
+	private function get_hammer() {
+		return ( isSet( $this->meta['hammer'] ) ) ? $this->meta['hammer'] : false;
+	}	
 
 	/**
 	 * Given an user ID, returns their author rank.
