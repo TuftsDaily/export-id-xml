@@ -128,15 +128,65 @@ class Export_ID_XML_Admin_UserMeta {
 
 	}
 
-	public function display() {
+	public function display($user) {
+?>
+
+	<h3>Print Information</h3>
+
+	<table class="form-table">
+
+		<tr>
+			<th><label for="daily-rank">Rank</label></th>
+
+			<td>
+				<input type="text" name="daily-rank" id="daily-rank" value="<?php echo esc_attr( get_the_author_meta( 'daily-rank', $user->ID ) ); ?>" class="regular-text" /><br />
+				<span class="description">Something like "Executive News Editor", "Arts Editor", or "Assistant Features Editor".</span>
+			</td>
+		</tr>
+
+	</table>
+
+<?php
+	}
+
+	public function save($user_id) {
+
+		if (!current_user_can('edit_user', $user_id)) {
+			die('bad permission');
+			return false;
+		}
+
+		$rank = $_POST['daily-rank'];
+		update_user_meta( $user_id, 'daily-rank', $rank );
+
+		if (!$rank) { return; }
+		$this->autogen_bio($rank, $user_id);
 
 	}
 
-	public function save() {
+	private function autogen_bio($rank, $user_id) {
 
-	}
+		$existing_bio = get_the_author_meta('description', $user_id);
 
-	private function autogen_bio() {
+		if (!$existing_bio) {
+
+			// Choose the/a/an
+			$vowels = array('a', 'e', 'i', 'o', 'u');
+			if (strpos($rank, 'Executive') !== false) {
+				$article = 'the';
+			} else if (in_array(strtolower($rank[0]), $vowels)) {
+				$article = 'an';
+			} else {
+				$article = 'a';
+			}
+
+			$name = get_the_author_meta('display_name', $user_id);
+			
+			// Something Like: Andrew Stephens is a Layout Editor at the Tufts Daily.
+			$bio = $name.' is '.$article.' '.$rank.' at the Tufts Daily.';
+
+			update_user_meta($user_id, 'description', $bio);
+		}
 
 	}
 

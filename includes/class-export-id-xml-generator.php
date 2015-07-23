@@ -37,10 +37,11 @@ class Export_ID_XML_Generator {
 		}
 		
 		// Generate XML For Each Article
-		$aggregateXML = "";
+		$aggregateXML = "<section>";
 		foreach ($posts as $post) {
 			$aggregateXML .= self::generate_article($post->ID);
 		}
+		$aggregateXML .= "</section>";
 		return $aggregateXML;
 
 	}
@@ -70,6 +71,7 @@ class Export_ID_XML_Generator {
 		$this->context['jumpword'] = $this->get_jumpword();
 		$this->context['conthead'] = $this->get_conthead();
 		$this->context['hammer'] = $this->get_hammer();
+		$this->context['photos'] = $this->get_photos();
 
 	}
 
@@ -216,7 +218,24 @@ class Export_ID_XML_Generator {
 
 	private function get_hammer() {
 		return ( isSet( $this->meta['hammer'] ) ) ? $this->meta['hammer'] : false;
-	}	
+	}
+
+	private function get_photos() {
+
+		$media = get_attached_media( 'image', $this->post->ID );
+		$photos = array();
+
+		foreach($media as $object) {
+			$photos[] = [
+				'url' => wp_get_attachment_url($object->ID),
+				'caption' => $object->post_excerpt,
+				'credit' => $object->post_content
+			];
+		}
+
+		return $photos;
+
+	}
 
 	/**
 	 * Given an user ID, returns their author rank.
