@@ -1,9 +1,10 @@
 <article name="{{ headline }}">
+	<kicker>{{ kicker }}</kicker>
 	{{#if hammer}}
 	<hammer>{{ hammer }}</hammer>
 	{{/if}}
 	<headline>{{ headline }}</headline>
-	<author><byline>by {{ author }}</byline>
+	<author><name>by {{ author }}</name>
 <rank>{{ rank }}</rank></author>
 	<jump>see {{ jumpword }}, page xx</jump>
 	<conthead>{{ conthead }}</conthead>
@@ -19,6 +20,5 @@
 	{{/each}}
 	</photos>
 	{{/if}}
-	<thumbnail>{{ thumbnail }}</thumbnail>
 	<body>{{ body }}</body>
 </article>

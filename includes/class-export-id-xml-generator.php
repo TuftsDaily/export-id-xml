@@ -17,6 +17,8 @@ class Export_ID_XML_Generator {
 
 	public static function generate_date($date) {
 
+		// TODO Add Functionality, Maybe?
+
 	}
 
 	public static function generate_category($catID, $date) {
@@ -71,6 +73,7 @@ class Export_ID_XML_Generator {
 		$this->context['jumpword'] = $this->get_jumpword();
 		$this->context['conthead'] = $this->get_conthead();
 		$this->context['hammer'] = $this->get_hammer();
+		$this->context['kicker'] = $this->get_kicker();
 		$this->context['photos'] = $this->get_photos();
 
 	}
@@ -220,6 +223,31 @@ class Export_ID_XML_Generator {
 		return ( isSet( $this->meta['hammer'] ) ) ? $this->meta['hammer'] : false;
 	}
 
+	private function get_kicker() {
+		//return ( isSet( $this->meta['hammer'] ) ) ? $this->meta['hammer'] : false;
+		// TODO Get Top-Level Category, unless Opinion, in which it's Op-Ed or Off the Hill
+		return "";
+	}
+
+	private function get_oth() {
+		
+		if (!$this->get_post_print_meta('is-off-the-hill'))
+			return false;
+
+		$oth = [];
+		$oth['paper'] = $this->get_post_print_meta('off-the-hill-paper');
+		$oth['university'] = $this->get_post_print_meta('off-the-hill-university');
+		return $oth;
+
+	}
+
+	private function get_column_title() {
+
+		// TODO Get Category Name as Such: Section > Section Columns > Column Name
+		return "";
+
+	}
+
 	private function get_photos() {
 
 		$media = get_attached_media( 'image', $this->post->ID );
@@ -236,6 +264,10 @@ class Export_ID_XML_Generator {
 		return $photos;
 
 	}
+
+	/////////////////////////////////////////////////////////////////
+	/// Helper Functions Below
+	////////////////////////////////////////////////////////////////
 
 	/**
 	 * Given an user ID, returns their author rank.
@@ -269,6 +301,74 @@ class Export_ID_XML_Generator {
 		if (!$printData) return false;
 		return (array_key_exists($key, $printData) ? $printData[$key] : false);
 
+	}
+
+		private function has_category($checkCatId) {
+		global $post;
+
+		$cats = wp_get_post_categories($post->ID);
+		return in_array($checkCatId, $cats);
+
+	}
+
+	/**
+	 * Create a hierarchical object of the categories of a post.
+	 * Stores as catArray class object following call.
+	 * 
+	 */
+
+	private function build_cat_array() {
+		global $post;
+
+		foreach(wp_get_post_categories($post->ID) as $catId) {
+
+			$cat = get_category($catId);
+			$lvl = $this->get_cat_lvl($catId);
+			if (!isSet($this->catArray[$lvl])) {
+				$this->catArray[$lvl] = array();
+			}
+			$this->catArray[$lvl][] = $cat;
+
+		}
+
+	}
+
+	/**
+	 * Returns the depth of a given category ID within its hierarchy.
+	 * Does NOT rely on the built_cat_array() function above.
+	 *
+	 * For example, if a post is classified as Arts > Book Review, we would
+	 * return 1 given the "Book Review" category ID.
+	 *
+	 * @param  integer Category ID being queried.
+	 * @param  integer Level counter, used internally for recursion.
+	 * @return integer Depth level of queried hierarchy. 
+	 */
+	private function get_cat_lvl($catId, $count=0) {
+		global $post;
+
+		$c = get_category($catId);
+		if ($c->category_parent == 0) {
+			return $count;
+		} else {
+			return $this->get_cat_lvl($c->category_parent, $count+1);
+		}
+
+	}
+
+	/**
+	 * Get category name at a given level.
+	 *
+	 * Given an hierarchical array of categories, get the category name at the
+	 * specified level. If there are multiple categories at the level, default
+	 * to the first entry.
+	 * 
+	 * @param  integer Level number of desired category, zero-indexed.
+	 * @param  integer Which category to return, if specificity is needed.
+	 * @return string Name of category that matches given criteria.
+	 */
+	private function get_cat_name_at_lvl($lvl, $which=0) {
+		return $this->catArray[$lvl][$which]->name;
 	}
 
 }

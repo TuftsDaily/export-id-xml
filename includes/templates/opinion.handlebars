@@ -1,0 +1,16 @@
+<article name="{{ headline }}">
+	<kicker>{kicker}</kicker>
+	<opinionhead>{headline}</opinionhead>
+	<author><name>by {{ author }}</name>
+{{#if oth}}
+<rank>{{ oth.paper }}</rank>
+{{/if}}</author>
+	<kicker>{{ kicker }}
+{{#if oth }}
+<oth-university>{{ oth.university }}</oth-university>
+{{/if}}</kicker>
+{{#if bio}}
+	<bio>{bio}</bio>
+{{/if}}
+	<body>{body}</body>
+</article>

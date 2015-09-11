@@ -27,9 +27,10 @@ class Export_ID_XML_Admin_PostMeta {
 			new Export_ID_XML_InputDef('print-date', 'date', 'Print Date', 'When will this article appear in print?'),
 			new Export_ID_XML_InputDef('jumpword', 'text', 'Jump Word', 'Used to connect two parts of article in print.'),
 			new Export_ID_XML_InputDef('conthead', 'text', 'Continuation Headline', 'Headline shown on second part of article in print.'),
-			new Export_ID_XML_InputDef('hammer', 'text', 'Hammer', 'Large print, short headline to attract attention.'),
+			new Export_ID_XML_InputDef('kicker', 'text', 'Kicker', 'Small print tag to categorize article. (ex. Album Review)'),
+			new Export_ID_XML_InputDef('hammer', 'text', 'Hammer', 'Large print, bold but short headline to attract attention. (ex. "Monaco dies")'),
 			new Export_ID_XML_InputDef('off-the-hill-university', 'text', 'Off the Hill University', null, 'off-the-hill'),
-			new Export_ID_XML_InputDef('off-the-hill-paper', 'text', 'Off the Hill Paper Name', null, 'off-the-hill')
+			new Export_ID_XML_InputDef('off-the-hill-author', 'text', 'Off the Hill Author', null, 'off-the-hill')
 		);
 
 	}
@@ -38,7 +39,7 @@ class Export_ID_XML_Admin_PostMeta {
 
 		// Hook for Creating the Box
 		$meta_box_init = function() {
-			add_meta_box('export_id_xml_options', 'Print Options', array($this, 'display'), 'post', 'side', 'high');
+			add_meta_box('export_id_xml_options', 'Print Options', array($this, 'display'), 'post', 'side', 'default');
 		};
 		add_action('add_meta_boxes', $meta_box_init);
 
@@ -77,10 +78,10 @@ class Export_ID_XML_Admin_PostMeta {
 					echo ' id="'.$input->gen_html_id().'"';
 					echo ' name="'.$input->gen_html_id().'"';
 					if ($this->data != '' && isSet($this->data[$input->id])) {
-						echo 'value="'.$this->data[$input->id].'"';
+						echo ' value="'.$this->data[$input->id].'"';
 					}
 					if ($input->showfor) {
-						echo 'class="showfor" data-showfor="'.$input->showfor.'"';
+						echo ' class="showfor" data-showfor="'.$input->showfor.'"';
 					}
 					echo ' />';
 			}

@@ -110,6 +110,8 @@ class Export_ID_XML {
 
 	private function send_error($msg) {
 
+		ob_end_clean();
+
 		header("Content-type: text/xml");
 		$response = "<?xml version='1.0' encoding='UTF-8'?>";
 		$response .= "<error>".$msg."</error>";
