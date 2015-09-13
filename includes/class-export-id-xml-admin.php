@@ -30,7 +30,8 @@ class Export_ID_XML_Admin_PostMeta {
 			new Export_ID_XML_InputDef('kicker', 'text', 'Kicker', 'Small print tag to categorize article. (ex. Album Review)'),
 			new Export_ID_XML_InputDef('hammer', 'text', 'Hammer', 'Large print, bold but short headline to attract attention. (ex. "Monaco dies")'),
 			new Export_ID_XML_InputDef('off-the-hill-university', 'text', 'Off the Hill University', null, 'off-the-hill'),
-			new Export_ID_XML_InputDef('off-the-hill-author', 'text', 'Off the Hill Author', null, 'off-the-hill')
+			new Export_ID_XML_InputDef('off-the-hill-author', 'text', 'Off the Hill Author', null, 'off-the-hill'),
+			new Export_ID_XML_InputDef('inside-this-issue', 'text', 'Inside This Issue', 'Text to display on the top of the front page.')
 		);
 
 	}
