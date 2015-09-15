@@ -53,11 +53,10 @@ class Export_ID_XML {
 	public function add_endpoints() {
 
 		// Matches Specific Article
-		//add_rewrite_rule('^xml/article/([0-9]+)/?','index.php?__xml=1&xml_article=$matches[1]','top');
+		add_rewrite_rule('^xml/article/([0-9]+)/?','index.php?__xml=1&xml_article=$matches[1]','top');
 
 		// Matches Date and Category
-		add_rewrite_rule('^xml/category/([A-Za-z]+)/date/([0-9-]+)/?','index.php?__xml=1&xml_category=$matches[1]&xml_date=$matches[2]','top');
-		//add_rewrite_rule('^xml/?','index.php?__xml=1','top');
+		add_rewrite_rule('^xml/category/([A-Za-z]+)/date/([0-9-]+)/?','index.php?__xml=2&xml_category=$matches[1]&xml_date=$matches[2]','top');
 
 		// Matches Date Queries Only
 		//add_rewrite_rule('^xml/date/([0-9-]+)/?','index.php?__xml=1&xml_date=$matches[1]','top');
@@ -76,28 +75,47 @@ class Export_ID_XML {
 	private function handle_request() {
 
 		global $wp;
-		$xml_category = $wp->query_vars['xml_category'];
-		$xml_date = $wp->query_vars['xml_date'];
+		$xml_mode = $wp->query_vars['__xml'];
 		
-		// Make Sure Required Params Were Given
-		if(!$xml_category)
-			$this->send_error("Category for articles not provided."); 
-		if(!$xml_date)
-			$this->send_error("Date for articles not provided."); 
-		
-		// Make Sure Params are Valid
-		$cat = get_category_by_slug($xml_category);
-		if (!$cat)
-			$this->send_error("Category not found.");
-		$catID = $cat->cat_ID;
+		// Mode 1 = Article Only
+		if ($xml_mode == 1) {
 
-		// Check for Proper Date Format: YYYY-MM-DD
-		if (!preg_match("/[0-9]{4}-[0-9]{2}-[0-9]{2}/", $xml_date))
-			$this->send_error("Invalid date format.");
+			$xml_article = $wp->query_vars['xml_article'];
 
-		// Generate and Output the XML
-		$xml = Export_ID_XML_Generator::generate_category($catID, $xml_date);
-		//$xml = Export_ID_XML_Generator::generate_article(18);
+			// Check Required Params
+			if (!$xml_article)
+				$this->send_error("Article ID not provided.");
+			
+			// Generate and Output the XML
+			$xml = Export_ID_XML_Generator::generate_article($xml_article);
+
+		// Mode 2 = Category and Date
+		} else {
+
+			$xml_category = $wp->query_vars['xml_category'];
+			$xml_date = $wp->query_vars['xml_date'];
+
+			// Check Required Params
+			if (!$xml_category)
+				$this->send_error("Category for articles not provided."); 
+			if(!$xml_date)
+				$this->send_error("Date for articles not provided."); 
+
+			// Make Sure Params are Valid
+			$cat = get_category_by_slug($xml_category);
+			if (!$cat)
+				$this->send_error("Category not found.");
+			
+			$catID = $cat->cat_ID;
+
+			// Check for Proper Date Format: YYYY-MM-DD
+			if (!preg_match("/[0-9]{4}-[0-9]{2}-[0-9]{2}/", $xml_date))
+				$this->send_error("Invalid date format.");
+
+			// Generate and Output the XML
+			$xml = Export_ID_XML_Generator::generate_category($catID, $xml_date);
+			
+		}
 
 		ob_end_clean();
 

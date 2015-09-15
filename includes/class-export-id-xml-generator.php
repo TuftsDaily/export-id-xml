@@ -8,7 +8,7 @@ class Export_ID_XML_Generator {
 
 		$post = get_post($postID);
 		if (!$post) 
-			return false;
+			return "<error>No post found with this ID.</error>";
 
 		$article = new Export_ID_XML_Generator($post);
 		return $article->render();
@@ -22,9 +22,6 @@ class Export_ID_XML_Generator {
 	}
 
 	public static function generate_category($catID, $date) {
-
-		var_dump($catID);
-		var_dump($date);
 
 		// Query All Posts by Print Date
 		$args = array(
@@ -61,9 +58,14 @@ class Export_ID_XML_Generator {
 	// Constructor for Object-Based Version of Class
 	public function __construct($post) {
 
+		// Set Category ID Values, if Necessary
+		if (!isSet($this->OPINION_CATEGORY_ID)) {
+			$this->OPINION_CATEGORY_ID = get_cat_ID("Opinion");
+		}
+
 		$this->post = $post;
 		$this->context = array();
-		$this->template = 'standard';
+		$this->template = $this->get_template_context();
 
 		$this->meta = get_post_meta( $post->ID, Export_ID_XML_Admin_PostMeta::$META_KEY_NAME, true );
 
@@ -77,6 +79,9 @@ class Export_ID_XML_Generator {
 		$this->context['kicker'] = $this->get_kicker();
 		$this->context['photos'] = $this->get_photos();
 
+		// Optional for Off-the-Hill Context
+		$this->context['oth'] = $this->get_oth();
+
 	}
 
 	public function render() {
@@ -89,6 +94,13 @@ class Export_ID_XML_Generator {
 
 	}
 
+	private function get_template_context() {
+
+		// TODO Change Template Based on Category
+		return 'standard';
+
+	}
+
 	private function get_title() {
 		return $this->post->post_title;
 	}
@@ -96,9 +108,9 @@ class Export_ID_XML_Generator {
 	private function get_author() {
 
 		// Off-the-Hill Articles Store Author in Editorial Metadata
-		if ($this->get_post_print_meta('is-off-the-hill')) 
-			return $this->get_post_print_meta('off-the-hill-author');
-		
+		if (isSet($this->meta['off-the-hill-author'])) 
+			return $this->meta['off-the-hill-author'];
+
 
 		// Get Using Co-Authors Plus Plugin Functions
 		if (function_exists('get_coauthors')) {
@@ -130,9 +142,9 @@ class Export_ID_XML_Generator {
 
 	private function get_rank() {
 
-		// Off-the-Hill Articles Store University Paper Name as the Rank
-		if ($this->get_post_print_meta('is-off-the-hill'))
-			return $this->get_post_print_meta('off-the-hill-paper');
+		// Off-the-Hill Articles Have No Rank with Author
+		if (isSet($this->meta['off-the-hill-author']))
+			return false;
 		
 
 		// Get Using Co-Authors Plus Plugin Functions
@@ -171,7 +183,7 @@ class Export_ID_XML_Generator {
 	private function get_bio() {
 
 		// No Bio for Off-The-Hills
-		if ($this->get_post_print_meta('is-off-the-hill'))
+		if (isSet($this->meta['off-the-hill-author']))
 			return false;
 		
 
@@ -206,14 +218,14 @@ class Export_ID_XML_Generator {
 		$body = $this->post->post_content;
 		$body = str_replace("\r\n\r\n", "\r\n", $body); // Replace Double-Newline
 		$body = str_replace("&nbsp;", " ", $body); // Strip &nbsp;
-		//$body = strip_tags($body, '<strong><em>'); // And Strip Out HTML
+		$body = strip_tags($body, '<strong><em>'); // And Strip Out HTML
 		$body = wptexturize($body); // Fix quotations and other encoding
 		return $body;
 
 	}
 
 	private function get_jumpword() {
-		return ( isSet( $this->meta['jumpword'] ) ) ? $this->meta['jumpword'] : false;
+		return ( isSet( $this->meta['jumpword'] ) ) ? strtoupper($this->meta['jumpword']) : false;
 	}
 
 	private function get_conthead() {
@@ -225,19 +237,16 @@ class Export_ID_XML_Generator {
 	}
 
 	private function get_kicker() {
-		//return ( isSet( $this->meta['hammer'] ) ) ? $this->meta['hammer'] : false;
-		// TODO Get Top-Level Category, unless Opinion, in which it's Op-Ed or Off the Hill
-		return "";
+		return ( isSet( $this->meta['kicker'] ) ) ? strtoupper($this->meta['kicker']) : false;
 	}
 
 	private function get_oth() {
 		
-		if (!$this->get_post_print_meta('is-off-the-hill'))
+		if (!isSet($this->meta['off-the-hill-university']))
 			return false;
 
 		$oth = [];
-		$oth['paper'] = $this->get_post_print_meta('off-the-hill-paper');
-		$oth['university'] = $this->get_post_print_meta('off-the-hill-university');
+		$oth['university'] = $this->meta['off-the-hill-university'];
 		return $oth;
 
 	}
@@ -257,8 +266,8 @@ class Export_ID_XML_Generator {
 		foreach($media as $object) {
 			$photos[] = [
 				'url' => wp_get_attachment_url($object->ID),
-				'caption' => $object->post_excerpt,
-				'credit' => $object->post_content
+				'caption' => $object->post_content,
+				'credit' => $object->post_excerpt
 			];
 		}
 
@@ -287,24 +296,8 @@ class Export_ID_XML_Generator {
 
 	}
 
-	/**
-	 * Given a key, returns the associated post meta value.
-	 * 
-	 * All print post meta is stored in a serialized array, 
-	 * and the appropriate value is extracted, if exists.
-	 *
-	 * @return mixed Meta value if key exists, false otherwise.
-	 */
 
-	private function get_post_print_meta($key) {
-
-		$printData = get_post_meta($this->post->ID, 'xml_print_meta', true);
-		if (!$printData) return false;
-		return (array_key_exists($key, $printData) ? $printData[$key] : false);
-
-	}
-
-		private function has_category($checkCatId) {
+	private function has_category($checkCatId) {
 		global $post;
 
 		$cats = wp_get_post_categories($post->ID);

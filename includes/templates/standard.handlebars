@@ -1,24 +1,27 @@
-<article name="{{ headline }}">
-	<kicker>{{ kicker }}</kicker>
-	{{#if hammer}}
-	<hammer>{{ hammer }}</hammer>
+<article name="{{{ headline }}}">
+	{{#if kicker}}
+	<kicker>{{{ kicker }}}{{#if oth}}
+<oth-university>{{{ oth.university }}}</oth-university>{{/if}}</kicker>
 	{{/if}}
-	<headline>{{ headline }}</headline>
-	<author><name>by {{ author }}</name>
-<rank>{{ rank }}</rank></author>
-	<jump>see {{ jumpword }}, page xx</jump>
-	<conthead>{{ conthead }}</conthead>
-	<continuation><contjump>{{ jumpword }}</contjump>
+	{{#if hammer}}
+	<hammer>{{{ hammer }}}</hammer>
+	{{/if}}
+	<headline>{{{ headline }}}</headline>
+	<author><name>by {{{ author }}}</name>{{#if rank}}
+<rank>{{{ rank }}}</rank>{{/if}}</author>
+	<jump>see {{{ jumpword }}}, page xx</jump>
+	<conthead>{{{ conthead }}}</conthead>
+	<continuation><contjump>{{{ jumpword }}}</contjump>
 <contpage>continued from page xx</contpage></continuation>
 	{{#if photos}}
 	<photos>
 	{{#each photos}}
-		<photo url="{{ url }}">
-			<photocredit>{{ credit }}</photocredit>
-			<photocaption>{{ caption }}</photocaption>
+		<photo url="{{{ url }}}">
+			<photocredit>{{{ credit }}}</photocredit>
+			<photocaption>{{{ caption }}}</photocaption>
 		</photo>
 	{{/each}}
 	</photos>
 	{{/if}}
-	<body>{{ body }}</body>
+	<body>{{{ body }}}</body>
 </article>
