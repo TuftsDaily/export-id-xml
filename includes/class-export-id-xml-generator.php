@@ -108,7 +108,7 @@ class Export_ID_XML_Generator {
 	private function get_author() {
 
 		// Off-the-Hill Articles Store Author in Editorial Metadata
-		if (isSet($this->meta['off-the-hill-author'])) 
+		if (isSet($this->meta['off-the-hill-author']) && $this->meta['off-the-hill-author'] != '')
 			return $this->meta['off-the-hill-author'];
 
 
@@ -143,7 +143,7 @@ class Export_ID_XML_Generator {
 	private function get_rank() {
 
 		// Off-the-Hill Articles Have No Rank with Author
-		if (isSet($this->meta['off-the-hill-author']))
+		if (isSet($this->meta['off-the-hill-author']) && $this->meta['off-the-hill-author'] != '')
 			return false;
 		
 
@@ -242,7 +242,7 @@ class Export_ID_XML_Generator {
 
 	private function get_oth() {
 		
-		if (!isSet($this->meta['off-the-hill-university']))
+		if (!isSet($this->meta['off-the-hill-university']) || $this->meta['off-the-hill-university'] == '')
 			return false;
 
 		$oth = [];
