@@ -4,6 +4,10 @@ use Handlebars\Handlebars;
 
 class Export_ID_XML_Generator {
 
+	// These Get Set 
+	public static $OPINION_CATEGORY_ID = -1;
+	public static $COLUMNS_CATEGORY_ID = -1;
+
 	public static function generate_article($postID) {
 
 		$post = get_post($postID);
@@ -58,9 +62,10 @@ class Export_ID_XML_Generator {
 	// Constructor for Object-Based Version of Class
 	public function __construct($post) {
 
-		// Set Category ID Values, if Necessary
-		if (!isSet($this->OPINION_CATEGORY_ID)) {
-			$this->OPINION_CATEGORY_ID = get_cat_ID("Opinion");
+		// Set Category ID Values, but First Time Only
+		if (Export_ID_XML_Generator::$OPINION_CATEGORY_ID == -1) {
+			Export_ID_XML_Generator::$OPINION_CATEGORY_ID = get_cat_ID("Opinion");
+			Export_ID_XML_Generator::$COLUMNS_CATEGORY_ID = get_cat_ID("Columns");
 		}
 
 		$this->post = $post;
@@ -97,19 +102,26 @@ class Export_ID_XML_Generator {
 	private function get_template_context() {
 
 		// TODO Change Template Based on Category
-		return 'standard';
+
+		if ($this->has_category(Export_ID_XML_Generator::$COLUMNS_CATEGORY_ID)) {
+			return 'column';
+		} else if ($this->has_category(Export_ID_XML_Generator::$OPINION_CATEGORY_ID)) {
+			return 'opinion';
+		} else {
+			return 'standard';
+		}
 
 	}
 
 	private function get_title() {
-		return $this->post->post_title;
+		return wptexturize($this->post->post_title);
 	}
 
 	private function get_author() {
 
 		// Off-the-Hill Articles Store Author in Editorial Metadata
-		if (isSet($this->meta['off-the-hill-author']) && $this->meta['off-the-hill-author'] != '')
-			return $this->meta['off-the-hill-author'];
+		if ($this->get_article_meta('off-the-hill-author'))
+			return $this->get_article_meta('off-the-hill-author');
 
 
 		// Get Using Co-Authors Plus Plugin Functions
@@ -143,7 +155,7 @@ class Export_ID_XML_Generator {
 	private function get_rank() {
 
 		// Off-the-Hill Articles Have No Rank with Author
-		if (isSet($this->meta['off-the-hill-author']) && $this->meta['off-the-hill-author'] != '')
+		if ($this->get_article_meta('off-the-hill-author'))
 			return false;
 		
 
@@ -183,7 +195,7 @@ class Export_ID_XML_Generator {
 	private function get_bio() {
 
 		// No Bio for Off-The-Hills
-		if (isSet($this->meta['off-the-hill-author']))
+		if (!$this->get_article_meta('off-the-hill-author'))
 			return false;
 		
 
@@ -225,36 +237,29 @@ class Export_ID_XML_Generator {
 	}
 
 	private function get_jumpword() {
-		return ( isSet( $this->meta['jumpword'] ) ) ? strtoupper($this->meta['jumpword']) : false;
+		return $this->get_article_meta('jumpword');
 	}
 
 	private function get_conthead() {
-		return ( isSet( $this->meta['conthead'] ) ) ? $this->meta['conthead'] : false;
+		return $this->get_article_meta('conthead');
 	}
 
 	private function get_hammer() {
-		return ( isSet( $this->meta['hammer'] ) ) ? $this->meta['hammer'] : false;
+		return $this->get_article_meta('hammer');
 	}
 
 	private function get_kicker() {
-		return ( isSet( $this->meta['kicker'] ) ) ? strtoupper($this->meta['kicker']) : false;
+		return $this->get_article_meta('kicker');
 	}
 
 	private function get_oth() {
 		
-		if (!isSet($this->meta['off-the-hill-university']) || $this->meta['off-the-hill-university'] == '')
+		if (!$this->get_article_meta('off-the-hill-university'))
 			return false;
 
 		$oth = [];
-		$oth['university'] = $this->meta['off-the-hill-university'];
+		$oth['university'] = $this->get_article_meta('off-the-hill-university');
 		return $oth;
-
-	}
-
-	private function get_column_title() {
-
-		// TODO Get Category Name as Such: Section > Section Columns > Column Name
-		return "";
 
 	}
 
@@ -279,6 +284,26 @@ class Export_ID_XML_Generator {
 	/// Helper Functions Below
 	////////////////////////////////////////////////////////////////
 
+
+	/**
+	 * Requests article data from the post meta field.
+	 * 
+	 * Assumes that post meta has already been retrieved, follows the standard
+	 * JSON format, and is stored under the self::meta variable.
+	 *
+	 * Blank values are treated the same as non-existant.
+	 *
+	 * @return bool|string Meta value, or false if non-existant.
+	 */
+	private function get_article_meta($key) {
+		if (!isSet($this->meta[$key]) || $this->meta[$key] == '') {
+			return false;
+		} else {
+			return $this->meta[$key];
+		}
+	}
+
+
 	/**
 	 * Given an user ID, returns their author rank.
 	 * 
@@ -298,9 +323,8 @@ class Export_ID_XML_Generator {
 
 
 	private function has_category($checkCatId) {
-		global $post;
 
-		$cats = wp_get_post_categories($post->ID);
+		$cats = wp_get_post_categories($this->post->ID);
 		return in_array($checkCatId, $cats);
 
 	}
@@ -310,59 +334,5 @@ class Export_ID_XML_Generator {
 	 * Stores as catArray class object following call.
 	 * 
 	 */
-
-	private function build_cat_array() {
-		global $post;
-
-		foreach(wp_get_post_categories($post->ID) as $catId) {
-
-			$cat = get_category($catId);
-			$lvl = $this->get_cat_lvl($catId);
-			if (!isSet($this->catArray[$lvl])) {
-				$this->catArray[$lvl] = array();
-			}
-			$this->catArray[$lvl][] = $cat;
-
-		}
-
-	}
-
-	/**
-	 * Returns the depth of a given category ID within its hierarchy.
-	 * Does NOT rely on the built_cat_array() function above.
-	 *
-	 * For example, if a post is classified as Arts > Book Review, we would
-	 * return 1 given the "Book Review" category ID.
-	 *
-	 * @param  integer Category ID being queried.
-	 * @param  integer Level counter, used internally for recursion.
-	 * @return integer Depth level of queried hierarchy. 
-	 */
-	private function get_cat_lvl($catId, $count=0) {
-		global $post;
-
-		$c = get_category($catId);
-		if ($c->category_parent == 0) {
-			return $count;
-		} else {
-			return $this->get_cat_lvl($c->category_parent, $count+1);
-		}
-
-	}
-
-	/**
-	 * Get category name at a given level.
-	 *
-	 * Given an hierarchical array of categories, get the category name at the
-	 * specified level. If there are multiple categories at the level, default
-	 * to the first entry.
-	 * 
-	 * @param  integer Level number of desired category, zero-indexed.
-	 * @param  integer Which category to return, if specificity is needed.
-	 * @return string Name of category that matches given criteria.
-	 */
-	private function get_cat_name_at_lvl($lvl, $which=0) {
-		return $this->catArray[$lvl][$which]->name;
-	}
 
 }
