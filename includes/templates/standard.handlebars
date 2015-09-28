@@ -1,7 +1,6 @@
 <article name="{{{ headline }}}">
 	{{#if kicker}}
-	<kicker>{{{ kicker }}}
-	{{#if oth}}
+	<kicker>{{{ kicker }}}{{#if oth}}
 <oth-university>{{{ oth.university }}}</oth-university>{{/if}}</kicker>
 	{{/if}}
 	{{#if hammer}}
@@ -21,6 +20,10 @@
 <photocaption>{{{ caption }}}</photocaption></photo>
 	{{/each}}
 	</photos>
+	{{/if}}
+	{{#if photo}}
+	<photo url="{{{ url }}}"><photocredit>{{{ credit }}}</photocredit>
+<photocaption>{{{ caption }}}</photocaption></photo>
 	{{/if}}
 	<body>{{{ body }}}</body>
 </article>

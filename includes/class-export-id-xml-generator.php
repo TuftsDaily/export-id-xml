@@ -82,7 +82,14 @@ class Export_ID_XML_Generator {
 		$this->context['conthead'] = $this->get_conthead();
 		$this->context['hammer'] = $this->get_hammer();
 		$this->context['kicker'] = $this->get_kicker();
-		$this->context['photos'] = $this->get_photos();
+		$this->context['bio'] = $this->get_bio();
+		
+		$photos = $this->get_photos();
+		if(sizeof($photos) > 1) {
+			$this->context['photos'] = $photos;
+		} else if (sizeof($photos) == 1) {
+			$this->context['photo'] = $photos[0];
+		}
 
 		// Optional for Off-the-Hill Context
 		$this->context['oth'] = $this->get_oth();
@@ -195,7 +202,7 @@ class Export_ID_XML_Generator {
 	private function get_bio() {
 
 		// No Bio for Off-The-Hills
-		if (!$this->get_article_meta('off-the-hill-author'))
+		if ($this->get_article_meta('off-the-hill-author'))
 			return false;
 		
 
