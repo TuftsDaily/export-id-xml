@@ -32,7 +32,8 @@ class Export_ID_XML_Generator {
 			'meta_key' => 'export_id_xml_print_date',
 			'meta_value' => $date,
 			'category' => $catID,
-			'post_status' => 'any'
+			'post_status' => 'any',
+			'posts_per_page' => -1
 		);
 		$posts = get_posts($args);
 
