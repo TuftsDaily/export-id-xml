@@ -251,7 +251,7 @@ class Export_ID_XML_Generator {
 	}
 
 	private function get_hammer() {
-		return wp_texturize($this->get_article_meta('hammer'));
+		return wptexturize($this->get_article_meta('hammer'));
 	}
 
 	private function get_kicker() {
@@ -277,7 +277,7 @@ class Export_ID_XML_Generator {
 		foreach($media as $object) {
 			$photos[] = [
 				'href' => wp_get_attachment_url($object->ID),
-				'caption' => wp_texturize($object->post_content),
+				'caption' => wptexturize($object->post_content),
 				'credit' => $object->post_excerpt
 			];
 		}
