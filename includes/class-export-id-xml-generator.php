@@ -109,8 +109,6 @@ class Export_ID_XML_Generator {
 
 	private function get_template_context() {
 
-		// TODO Change Template Based on Category
-
 		if ($this->has_category(Export_ID_XML_Generator::$COLUMNS_CATEGORY_ID)) {
 			return 'column';
 		} else if ($this->has_category(Export_ID_XML_Generator::$OPINION_CATEGORY_ID)) {
@@ -253,7 +251,7 @@ class Export_ID_XML_Generator {
 	}
 
 	private function get_hammer() {
-		return $this->get_article_meta('hammer');
+		return wp_texturize($this->get_article_meta('hammer'));
 	}
 
 	private function get_kicker() {
@@ -279,7 +277,7 @@ class Export_ID_XML_Generator {
 		foreach($media as $object) {
 			$photos[] = [
 				'href' => wp_get_attachment_url($object->ID),
-				'caption' => $object->post_content,
+				'caption' => wp_texturize($object->post_content),
 				'credit' => $object->post_excerpt
 			];
 		}
