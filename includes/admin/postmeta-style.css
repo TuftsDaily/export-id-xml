@@ -1,4 +1,4 @@
-#export_id_xml_options input {
+#export_id_xml_options input, #export_id_xml_options textarea {
 	display: block;
 	margin-bottom: 15px;
 }

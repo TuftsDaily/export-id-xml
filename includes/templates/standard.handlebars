@@ -16,14 +16,14 @@
 	{{#if photos}}
 	<photos>
 	{{#each photos}}
-		<photo url="{{{ url }}}"><photocredit>{{{ credit }}}</photocredit>
+		<photo href="{{{ href }}}"><photocredit>{{{ credit }}}</photocredit>
 <photocaption>{{{ caption }}}</photocaption></photo>
 	{{/each}}
 	</photos>
 	{{/if}}
 	{{#if photo}}
-	<photo url="{{{ url }}}"><photocredit>{{{ credit }}}</photocredit>
-<photocaption>{{{ caption }}}</photocaption></photo>
+	<photo href="{{{ photo.href }}}"><photocredit>{{{ photo.credit }}}</photocredit>
+<photocaption>{{{ photo.caption }}}</photocaption></photo>
 	{{/if}}
 	<body>{{{ body }}}</body>
 </article>

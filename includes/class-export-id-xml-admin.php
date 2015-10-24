@@ -26,12 +26,12 @@ class Export_ID_XML_Admin_PostMeta {
 		$this->inputs = array(
 			new Export_ID_XML_InputDef('print-date', 'date', 'Print Date', 'When will this article appear in print?'),
 			new Export_ID_XML_InputDef('jumpword', 'text', 'Jump Word', 'Used to connect two parts of article in print.'),
-			new Export_ID_XML_InputDef('conthead', 'text', 'Continuation Headline', 'Headline shown on second part of article in print.'),
+			new Export_ID_XML_InputDef('conthead', 'box', 'Continuation Headline', 'Headline shown on second part of article in print.'),
 			new Export_ID_XML_InputDef('kicker', 'text', 'Kicker', 'Small print tag to categorize article. (ex. Album Review)'),
-			new Export_ID_XML_InputDef('hammer', 'text', 'Hammer', 'Large print, bold but short headline to attract attention. (ex. "Monaco dies")'),
+			new Export_ID_XML_InputDef('hammer', 'box', 'Hammer', 'Large print, bold but short headline to attract attention. (ex. "Monaco dies")'),
 			new Export_ID_XML_InputDef('off-the-hill-university', 'text', 'Off the Hill University', null, 'off-the-hill'),
-			new Export_ID_XML_InputDef('off-the-hill-author', 'text', 'Off the Hill Author', null, 'off-the-hill'),
-			new Export_ID_XML_InputDef('inside-this-issue', 'text', 'Inside This Issue', 'Text to display on the top of the front page.')
+			new Export_ID_XML_InputDef('off-the-hill-author', 'text', 'Off the Hill Author', null, 'off-the-hill')
+			// new Export_ID_XML_InputDef('inside-this-issue', 'text', 'Inside This Issue', 'Text to display on the top of the front page.')
 		);
 
 	}
@@ -69,6 +69,27 @@ class Export_ID_XML_Admin_PostMeta {
 
 			// This is admittedly a dumb construct but allows for future expansion.
 			switch($input->type) {
+
+				case 'box':
+
+					echo '<label for="export_id_xml_'.$input->id.'" />';
+						echo '<strong>'.$input->title.'</strong>';
+						if ($input->detail) { echo '<br /><em>'.$input->detail.'</em>'; }
+					echo '</label>';
+
+					echo '<textarea';
+					echo ' id="'.$input->gen_html_id().'"';
+					echo ' name="'.$input->gen_html_id().'"';
+					if ($input->showfor) {
+						echo ' class="showfor" data-showfor="'.$input->showfor.'"';
+					}
+					echo '>';
+					if ($this->data != '' && isSet($this->data[$input->id])) {
+						echo $this->data[$input->id];
+					}
+					echo '</textarea>';
+					break;
+
 				default:
 					echo '<label for="export_id_xml_'.$input->id.'" />';
 						echo '<strong>'.$input->title.'</strong>';

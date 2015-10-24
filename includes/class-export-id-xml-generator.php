@@ -278,7 +278,7 @@ class Export_ID_XML_Generator {
 
 		foreach($media as $object) {
 			$photos[] = [
-				'url' => wp_get_attachment_url($object->ID),
+				'href' => wp_get_attachment_url($object->ID),
 				'caption' => $object->post_content,
 				'credit' => $object->post_excerpt
 			];
