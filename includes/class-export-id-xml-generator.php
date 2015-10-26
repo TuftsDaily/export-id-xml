@@ -247,7 +247,7 @@ class Export_ID_XML_Generator {
 	}
 
 	private function get_conthead() {
-		return $this->get_article_meta('conthead');
+		return wptexturize($this->get_article_meta('conthead'));
 	}
 
 	private function get_hammer() {
@@ -255,7 +255,7 @@ class Export_ID_XML_Generator {
 	}
 
 	private function get_kicker() {
-		return $this->get_article_meta('kicker');
+		return wptexturize($this->get_article_meta('kicker'));
 	}
 
 	private function get_oth() {
