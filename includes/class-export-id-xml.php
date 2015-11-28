@@ -47,16 +47,17 @@ class Export_ID_XML {
 		$vars[] = 'xml_category';
 		$vars[] = 'xml_date';
 		$vars[] = 'xml_article';
+		$vars[] = 'xml_option';
 		return $vars;
 	}
 
 	public function add_endpoints() {
 
 		// Matches Specific Article
-		add_rewrite_rule('^xml/article/([0-9]+)/?','index.php?__xml=1&xml_article=$matches[1]','top');
+		add_rewrite_rule('^xml\/article\/([0-9]+)\/?(\w+)?','index.php?__xml=1&xml_article=$matches[1]&xml_option=$matches[2]','top');
 
 		// Matches Date and Category
-		add_rewrite_rule('^xml/category/([A-Za-z]+)/date/([0-9-]+)/?','index.php?__xml=2&xml_category=$matches[1]&xml_date=$matches[2]','top');
+		add_rewrite_rule('^xml\/category\/([A-Za-z]+)\/date\/([0-9-]+)\/?(\w+)?','index.php?__xml=2&xml_category=$matches[1]&xml_date=$matches[2]&xml_option=$matches[3]','top');
 
 		// Matches Date Queries Only
 		//add_rewrite_rule('^xml/date/([0-9-]+)/?','index.php?__xml=1&xml_date=$matches[1]','top');
@@ -89,6 +90,9 @@ class Export_ID_XML {
 			// Generate and Output the XML
 			$xml = Export_ID_XML_Generator::generate_article($xml_article);
 
+			// In Case of Download, Name After Article ID
+			$filename = $xml_article.'.xml';
+
 		// Mode 2 = Category and Date
 		} else {
 
@@ -114,12 +118,21 @@ class Export_ID_XML {
 
 			// Generate and Output the XML
 			$xml = Export_ID_XML_Generator::generate_category($catID, $xml_date);
+
+			// In Case of Download, Name After Section Name
+			$filename = $xml_category.'.xml';
 			
 		}
 
 		ob_end_clean();
 
-		header("Content-type: text/xml");
+		if (isSet($wp->query_vars['xml_option']) && $wp->query_vars['xml_option'] == "download") {
+			header('Content-type: binary/text; charset=utf-8');
+			header('Content-Disposition: filename='.$filename);
+		} else {
+			header("Content-type: text/xml");
+		}
+
 		$response = '<?xml version="1.0" encoding="UTF-8"?>'."\n";
 		$response .= $xml;
 		echo $response;

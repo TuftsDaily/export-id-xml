@@ -13,17 +13,9 @@
 	<conthead>{{{ conthead }}}</conthead>
 	<continuation><contjump>{{{ jumpword }}}</contjump>
 <contpage>continued from page xx</contpage></continuation>
-	{{#if photos}}
-	<photos>
 	{{#each photos}}
 		<photo href="{{{ href }}}"><photocredit>{{{ credit }}}</photocredit>
 <photocaption>{{{ caption }}}</photocaption></photo>
 	{{/each}}
-	</photos>
-	{{/if}}
-	{{#if photo}}
-	<photo href="{{{ photo.href }}}"><photocredit>{{{ photo.credit }}}</photocredit>
-<photocaption>{{{ photo.caption }}}</photocaption></photo>
-	{{/if}}
 	<body>{{{ body }}}</body>
 </article>

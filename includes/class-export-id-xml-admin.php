@@ -10,6 +10,14 @@ class Export_ID_XML_Admin {
 		$post_meta->init();
 		$user_meta->init();
 
+		// Add XML Download Action to Post List Screen
+		$xml_callback = function($actions) {
+			global $post;
+			$actions[] = '<a href="'.get_bloginfo('url').'/xml/article/'.$post->ID.'/download/" title="Download XML for InDesign" target="_blank">XML</a>';
+			return $actions;
+		};
+		add_filter('post_row_actions', $xml_callback);
+
 	}
 	
 }
