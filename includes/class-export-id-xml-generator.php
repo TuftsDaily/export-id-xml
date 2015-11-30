@@ -84,13 +84,7 @@ class Export_ID_XML_Generator {
 		$this->context['hammer'] = $this->get_hammer();
 		$this->context['kicker'] = $this->get_kicker();
 		$this->context['bio'] = $this->get_bio();
-		
-		$photos = $this->get_photos();
-		if(sizeof($photos) > 1) {
-			$this->context['photos'] = $photos;
-		} else if (sizeof($photos) == 1) {
-			$this->context['photo'] = $photos[0];
-		}
+		$this->context['photos'] = $this->get_photos();
 
 		// Optional for Off-the-Hill Context
 		$this->context['oth'] = $this->get_oth();
