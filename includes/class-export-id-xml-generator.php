@@ -21,13 +21,24 @@ class Export_ID_XML_Generator {
 
 	public static function generate_date($date) {
 
-		// TODO Add Functionality, Maybe?
+		$categories = get_categories(array(
+		    'orderby' => 'name',
+		    'parent'  => 0
+		));
+		
+		$aggregateXML = "<day>";
+		foreach ($categories as $category) {
+			var_dump($category);
+		    $aggregateXML .= self::generate_category($category->term_id, $date);
+		}
+		$aggregateXML .= "</day>";
+		return $aggregateXML;
 
 	}
 
 	public static function generate_category($catID, $date) {
 
-		// Query All Posts by Print Date
+		// Query All Posts by Print Date and CatID
 		$args = array(
 			'meta_key' => 'export_id_xml_print_date',
 			'meta_value' => $date,
@@ -40,9 +51,12 @@ class Export_ID_XML_Generator {
 		if (sizeof($posts) == 0) {
 			return "<error>No posts found for this category and date.</error>";
 		}
+
+		$section = get_category($catID);
+		var_dump($section);
 		
 		// Generate XML For Each Article
-		$aggregateXML = "<section>";
+		$aggregateXML = '<section id="'.$section->name.'">';
 		foreach ($posts as $post) {
 			$aggregateXML .= self::generate_article($post->ID);
 		}
@@ -75,6 +89,7 @@ class Export_ID_XML_Generator {
 
 		$this->meta = get_post_meta( $post->ID, Export_ID_XML_Admin_PostMeta::$META_KEY_NAME, true );
 
+		$this->context['url'] = $this->get_permalink();
 		$this->context['headline'] = $this->get_title();
 		$this->context['author'] = $this->get_author();
 		$this->context['rank'] = $this->get_rank();
@@ -111,6 +126,10 @@ class Export_ID_XML_Generator {
 			return 'standard';
 		}
 
+	}
+
+	private function get_permalink() {
+		return get_permalink($this->post);
 	}
 
 	private function get_title() {

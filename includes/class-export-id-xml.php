@@ -60,7 +60,7 @@ class Export_ID_XML {
 		add_rewrite_rule('^xml\/category\/([A-Za-z]+)\/date\/([0-9-]+)\/?(\w+)?','index.php?__xml=2&xml_category=$matches[1]&xml_date=$matches[2]&xml_option=$matches[3]','top');
 
 		// Matches Date Queries Only
-		//add_rewrite_rule('^xml/date/([0-9-]+)/?','index.php?__xml=1&xml_date=$matches[1]','top');
+		add_rewrite_rule('^xml/date/([0-9-]+)/?','index.php?__xml=3&xml_date=$matches[1]','top');
 	}
 
 	public function sniff_requests() {
@@ -92,6 +92,22 @@ class Export_ID_XML {
 
 			// In Case of Download, Name After Article ID
 			$filename = $xml_article.'.xml';
+
+		// Mode 3 = Date Only
+		} else if ($xml_mode == 3) {
+
+			$xml_date = $wp->query_vars['xml_date'];
+
+			// Check Required Params
+			if (!$xml_date)
+				$this->send_error("Date for articles not provided.");
+			
+			// Generate and Output the XML
+			$xml = Export_ID_XML_Generator::generate_date($xml_date);
+
+			// In Case of Download, Name After Article ID
+			$filename = $xml_date.'.xml';
+
 
 		// Mode 2 = Category and Date
 		} else {
