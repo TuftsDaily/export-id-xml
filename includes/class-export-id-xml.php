@@ -146,6 +146,7 @@ class Export_ID_XML {
 			header('Content-type: binary/text; charset=utf-8');
 			header('Content-Disposition: filename='.$filename);
 		} else {
+			header('Access-Control-Allow-Origin: *'); 	// for remote access
 			header("Content-type: text/xml");
 		}
 
